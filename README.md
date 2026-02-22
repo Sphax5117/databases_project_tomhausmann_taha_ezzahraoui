@@ -94,4 +94,4 @@ The MCD fully integrates the business rules and raw data dictionary into a norma
 1. **Recursive Relationship:** Applied to the `CREW MEMBER` entity via the `commands` association (a commander commands 0 to n crew members).
 2. **Weak Entity (Relative Identification):** Applied to the `REFINING BATCH` entity. A batch of spice is structurally dependent on the `HARVESTER` that produced it (`1,1(R)` cardinality).
 
-![MCD_image](MCD_image.jpg)
+![MCD_image](MCD.jpg)
