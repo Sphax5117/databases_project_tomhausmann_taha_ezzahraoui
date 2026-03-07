@@ -70,7 +70,7 @@ CREATE TABLE HARVESTER(
 CREATE TABLE REFINING_BATCH(
    harv_ID INT,
    batch_id VARCHAR(50),
-   batch_date DATETIME,
+   batch_date VARCHAR(50), -- This is not a date field, because, Dune is set 10000 years later from our time (which MySQL doesn't like)
    batch_purity_rating VARCHAR(50),
    batch_raw_aggregate DECIMAL(15,2),
    batch_spice_output VARCHAR(50),
