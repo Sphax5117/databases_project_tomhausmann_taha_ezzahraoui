@@ -40,29 +40,32 @@ CREATE TABLE IMPERIUM(
    PRIMARY KEY(imp_id)
 );
 
+-- 3. CHILD TABLES (Referential Integrity)
 CREATE TABLE CREW_MEMBER(
    member_id INT AUTO_INCREMENT,
    member_name VARCHAR(50),
    member_id_commander INT,
    cs_ID VARCHAR(50) NOT NULL,
    PRIMARY KEY(member_id),
-   FOREIGN KEY(member_id_commander) REFERENCES CREW_MEMBER(member_id),
-   FOREIGN KEY(cs_ID) REFERENCES CREW(cs_ID)
+   FOREIGN KEY(member_id_commander) REFERENCES CREW_MEMBER(member_id) ON DELETE SET NULL, -- if the commander is deleted, we set the crew's commander value to NULL
+   FOREIGN KEY(cs_ID) REFERENCES CREW(cs_ID) ON DELETE CASCADE -- if a crew is deleted, we deleted all of his members
 );
 
 CREATE TABLE HARVESTER(
    harv_ID INT AUTO_INCREMENT,
    harv_model VARCHAR(50),
-   harv_hull_integrity TINYINT UNSIGNED,
+   harv_hull_integrity INT,
    harv_max_storage DECIMAL(15,2),
    harv_maintenance_request_id VARCHAR(50),
    cs_ID VARCHAR(50) NOT NULL,
    ms_ID VARCHAR(50),
    PRIMARY KEY(harv_ID),
-   UNIQUE(cs_ID),
-   FOREIGN KEY(cs_ID) REFERENCES CREW(cs_ID),
-   FOREIGN KEY(ms_ID) REFERENCES HARVESTING_SECTOR(ms_ID)
+   UNIQUE(cs_ID), -- only one crew per harvester
+   FOREIGN KEY(cs_ID) REFERENCES CREW(cs_ID) ON DELETE RESTRICT,
+   FOREIGN KEY(ms_ID) REFERENCES HARVESTING_SECTOR(ms_ID) ON DELETE SET NULL
 );
+
+
 
 CREATE TABLE REFINING_BATCH(
    harv_ID INT,
@@ -75,9 +78,9 @@ CREATE TABLE REFINING_BATCH(
    imp_id INT NOT NULL,
    ref_facility_ID VARCHAR(50) NOT NULL,
    PRIMARY KEY(harv_ID, batch_id),
-   FOREIGN KEY(harv_ID) REFERENCES HARVESTER(harv_ID),
-   FOREIGN KEY(imp_id) REFERENCES IMPERIUM(imp_id),
-   FOREIGN KEY(ref_facility_ID) REFERENCES REFINERY(ref_facility_ID)
+   FOREIGN KEY(harv_ID) REFERENCES HARVESTER(harv_ID) ON DELETE CASCADE, -- if we delete a harvester, the associated batches are deleted
+   FOREIGN KEY(imp_id) REFERENCES IMPERIUM(imp_id) ON DELETE RESTRICT,-- can't delete imperium record; without deleting batches
+   FOREIGN KEY(ref_facility_ID) REFERENCES REFINERY(ref_facility_ID) ON DELETE RESTRICT -- as long as there is a batch, we can't delete the refinery
 );
 
 CREATE TABLE lift(
@@ -86,8 +89,8 @@ CREATE TABLE lift(
    ca_evacuation_ROS VARCHAR(50),
    ca_fuel_consumed DECIMAL(15,2),
    PRIMARY KEY(harv_ID, ca_ID),
-   FOREIGN KEY(harv_ID) REFERENCES HARVESTER(harv_ID),
-   FOREIGN KEY(ca_ID) REFERENCES CARRYALL(ca_ID)
+   FOREIGN KEY(harv_ID) REFERENCES HARVESTER(harv_ID) ON DELETE CASCADE, --
+   FOREIGN KEY(ca_ID) REFERENCES CARRYALL(ca_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE monitors(
@@ -97,8 +100,6 @@ CREATE TABLE monitors(
    sp_worm_proximity_alarm BOOLEAN,
    sp_time_to_worm_impact VARCHAR(50),
    PRIMARY KEY(harv_ID, sp_ID),
-   FOREIGN KEY(harv_ID) REFERENCES HARVESTER(harv_ID),
-   FOREIGN KEY(sp_ID) REFERENCES SPOTTER(sp_ID)
+   FOREIGN KEY(harv_ID) REFERENCES HARVESTER(harv_ID) ON DELETE CASCADE,
+   FOREIGN KEY(sp_ID) REFERENCES SPOTTER(sp_ID) ON DELETE CASCADE
 );
-
-
