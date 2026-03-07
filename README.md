@@ -1,6 +1,6 @@
 # Databases 1: Database Design and Development
-**Authors:** Tom Hausmann & Taha Ezzahraoui
-**Domain:** Imperial Resource Extraction (Arrakis Planetary Governorship)
+**Authors:** Tom Hausmann & Taha Ezzahraoui  
+**Domain:** Imperial Resource Extraction (Arrakis Planetary Governorship)  
 
 ## Introduction
 This repository contains the database design for the Harkonnen logistics network on Arrakis, developed using the MERISE methodology. Part 1 of this project covers the requirements analysis and the Conceptual Data Model (MCD).
@@ -24,19 +24,9 @@ To generate the requirements and data dictionary, we utilized the RICARDO framew
 > Imperial quotas and localized smuggling infractions.
 > Take inspiration from: The Dune appendices by Frank Herbert (ecology/economy), industrial petroleum extraction logs, and fleet management systems.
 >
-> Your organization wants to apply MERISE to design an information system. You are responsible for the analysis part, i.e., gathering the company's requirements. It has called on
-> a computer engineering student to carry out this project, and you must provide
-> him with the necessary information so that he can then apply the following
-> steps of database design and development himself.
-> First, establish the data business rules for your organization
-> in the form of a bulleted list. It must correspond to the information provided
-> by someone who knows how the company works, but not how an information system
-> is built.
-> Next, based on these rules, provide a raw data dictionary with the
-> following columns, grouped in a table: meaning of the data, type, size in
-> number of characters or digits. There should be between 25 and 35 data items.
-> It is used to provide additional information about each data item (size and
-> type) but without any assumptions about how the data will be modeled later.
+> Your organization wants to apply MERISE to design an information system. You are responsible for the analysis part, i.e., gathering the company's requirements. It has called on a computer engineering student to carry out this project, and you must provide him with the necessary information so that he can then apply the following steps of database design and development himself.
+> First, establish the data business rules for your organization in the form of a bulleted list. It must correspond to the information provided by someone who knows how the company works, but not how an information system is built.
+> Next, based on these rules, provide a raw data dictionary with the following columns, grouped in a table: meaning of the data, type, size in number of characters or digits. There should be between 25 and 35 data items. It is used to provide additional information about each data item (size and type) but without any assumptions about how the data will be modeled later.
 > Provide the business rules and the data dictionary.
 
 ### 2. Operational Business Rules
@@ -95,3 +85,22 @@ The MCD fully integrates the business rules and raw data dictionary into a norma
 2. **Weak Entity (Relative Identification):** Applied to the `REFINING BATCH` entity. A batch of spice is structurally dependent on the `HARVESTER` that produced it (`1,1(R)` cardinality).
 
 ![MCD_image](MCD.jpg)
+
+---
+
+## Step 3: Logical Data Model (MLD)
+
+The following schema represents the translation of the Conceptual Data Model (MCD) into relational tables. Primary keys are the leading attributes, and foreign keys are denoted by `#`.
+
+```text
+HARVESTING_SECTOR = (ms_ID VARCHAR(50), ms_latitude DECIMAL(15,15), ms_long DECIMAL(15,15), ms_surface_temp VARCHAR(50));
+CREW = (cs_ID VARCHAR(50), cs_headcount_start INT, cs_casualties VARCHAR(50), cs_smuggling_detected LOGICAL, cs_disciplinary_action_log VARCHAR(200));
+SPOTTER = (sp_ID VARCHAR(50));
+CARRYALL = (ca_ID VARCHAR(50));
+REFINERY = (ref_facility_ID VARCHAR(50));
+IMPERIUM = (imp_id COUNTER, imp_target_amount DECIMAL(15,2), imp_market_value CURRENCY);
+CREW_MEMBER = (member_id COUNTER, member_name VARCHAR(50), #member_id_commander*, #cs_ID);
+HARVESTER = (harv_ID COUNTER, harv_model VARCHAR(50), harv_hull_integrity BYTE, harv_max_storage DECIMAL(15,2), harv_maintenance_request_id VARCHAR(50), #cs_ID, #ms_ID*);
+REFINING_BATCH = (#harv_ID, batch_id VARCHAR(50), batch_date DATETIME, batch_purity_rating VARCHAR(50), batch_raw_aggregate DECIMAL(15,2), batch_spice_output VARCHAR(50), batch_value CURRENCY, #imp_id, #ref_facility_ID);
+lift = (#harv_ID, #ca_ID, ca_evacuation_ROS VARCHAR(50), ca_fuel_consumed DECIMAL(15,2));
+monitors = (#harv_ID, #sp_ID, sp_seismic_magnitude VARCHAR(50), sp_worm_proximity_alarm LOGICAL, sp_time_to_worm_impact VARCHAR(50));
