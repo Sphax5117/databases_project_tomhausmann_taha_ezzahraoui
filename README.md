@@ -148,7 +148,7 @@ FROM CREW_MEMBER
 WHERE member_name LIKE '%Tuek';
 ```
 
-
+---
 The Baron needs to understand which sectors of his fief are dangerous... To do so, he'll cross-examine data from his spotter and harvester, to check in which 
 sectors the seismic magnitude is either "High" or "Critical".
 
@@ -164,6 +164,7 @@ ORDER BY sp_seismic_magnitude
 
 This query uses : IN, sorting, SELECTION, Projection, Join
 
+---
 
 We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
 
