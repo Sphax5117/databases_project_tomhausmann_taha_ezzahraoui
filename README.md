@@ -231,6 +231,7 @@ LEFT JOIN REFINING_BATCH b ON r.ref_facility_ID = b.ref_facility_ID;
 ---
 The baron is interested in the crew with no casualties : they are his best man. He need to cross the CREW table with their assigned HARVESTER
 
+```sql
 SELECT 
     c.cs_ID, 
     c.cs_headcount_start, 
@@ -238,7 +239,7 @@ SELECT
 FROM CREW c
 LEFT JOIN HARVESTER h ON c.cs_ID = h.cs_ID
 WHERE c.cs_casualties = '0';
-
+```
 
 ---
  -- Aggregation Functions
