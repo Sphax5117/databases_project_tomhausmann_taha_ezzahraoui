@@ -211,7 +211,8 @@ WHERE cm.member_id_commander IS NULL;
 This query use : inner join, projection, selection
 
 ---
-
+ -- Aggregation Functions
+ 
 We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
 
 ```sql
@@ -225,15 +226,11 @@ GROUP BY ref_facility_ID
 ORDER BY efficiency_percentage ASC
 LIMIT 1;
 ```
- -- Aggregation Functions
  
--- An Imperial Operations Auditor has been sent to Arrakis
--- to evaluate the efficiency of House Harkonnen's spice
--- extraction chain.
+An Imperial Operations Auditor has been sent to Arrakis to evaluate the efficiency of House Harkonnen's spicevextraction chain.
 
 
--- The auditor needs to know which harvester contributes the most to the spice flow,
--- so he orders the harvesters from most to least spice output.
+The auditor needs to know which harvester contributes the most to the spice flow,so he orders the harvesters from most to least spice output.
 
 ```sql
 SELECT harv_ID,
@@ -243,8 +240,7 @@ GROUP BY harv_ID
 ORDER BY total_spice_output DESC;
 ```
 
--- The auditor suspects theft or inefficient refining in facilities where the gap
--- between raw aggregate and spice output is too large.
+The auditor suspects theft or inefficient refining in facilities where the gap between raw aggregate and spice output is too large.
 
 ```sql
 SELECT ref_facility_ID,
@@ -255,8 +251,7 @@ HAVING AVG(batch_raw_aggregate - CAST(batch_spice_output AS DECIMAL(15,2))) > 50
 ORDER BY avg_waste DESC;
 ```
 
--- Aerial rescue logistics can get quite expensive. In order to cut costs,
--- he highlights the least efficient carryalls.
+Aerial rescue logistics can get quite expensive. In order to cut costs,he highlights the least efficient carryalls.
 
 ```sql
 SELECT ca_ID,
@@ -267,8 +262,7 @@ HAVING AVG(ca_fuel_consumed) > 550
 ORDER BY avg_fuel_consumption DESC;
 ```
 
--- The auditor wants his "king harvester", the one that generates the highest wealth,
--- so he can closely monitor and protect it.
+The auditor wants his "king harvester", the one that generates the highest wealth,so he can closely monitor and protect it.
 
 ```sql
 SELECT harv_ID,
@@ -279,8 +273,7 @@ HAVING SUM(batch_value) > 700000
 ORDER BY total_batch_value DESC;
 ```
 
--- The auditor wants to reveal whether certain harvesters are being pushed
--- beyond safe limits while still remaining in service.
+The auditor wants to reveal whether certain harvesters are being pushed beyond safe limits while still remaining in service.
 
 ```sql
 SELECT harv_model,
