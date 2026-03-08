@@ -174,6 +174,28 @@ This query uses : IN, sorting, SELECTION, Projection, Join
 
 ---
 
+In one of the harvester malfunction (harv_maintenance_request_id = "REQ-URGENT"), some crew members died. Sure, house harkonnen doesn't honnor its people. But here, two very important man to the baron seem to have died. The baron needs to make sure who those two people were. (Note : one of them is the commander of the crew, while the other as the ID of the commander + 1)
+
+
+```
+SELECT member_name, cs_disciplinary_action_log
+FROM CREW_MEMBER CM
+JOIN HARVESTER H
+ON CM.cs_id = H.cs_id
+JOIN CREW C
+ON CM.cs_ID = C.cs_id
+WHERE H.harv_maintenance_request_id = "REQ-URGENT" 
+AND member_id - 1 = member_id_commander OR member_id = 13;
+;
+
+```
+
+This query uses : Selection, Projection, Multiple Join
+
+
+
+---
+
 We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
 
 ```
