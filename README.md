@@ -119,11 +119,10 @@ Harvesters have been falling appart...
 In one of the harvester malfunction, some crew members died. Sure, house harkonnen doesn't honnor its people. But here, two very important mans to the baron seems to have died. The baron needs to make sure who those two people were. (Note : one of them is the commander of the crew, while the other as the ID of the commander + 1)
 
 
-Here is the list of data that need to be extracted : 
+## Extracted Data
 
-## Projections and selections : 
 
-1) On arrakis, there are smuggler that are using highly industrialized channel to sell spice on the black Market. The Baron needs to get the batch rating and batch value of the facilities containing, in their name, the word "Smuggler" or "Industrial". 
+On arrakis, there are smuggler that are using highly industrialized channel to sell spice on the black Market. The Baron needs to get the batch rating and batch value of the facilities containing, in their name, the word "Smuggler" or "Industrial". 
 
 ```
 SELECT  
@@ -133,7 +132,7 @@ WHERE ref_facility_ID LIKE '%Smuggler%'
    OR ref_facility_ID LIKE '%Industrial%';
 ```
 
-2)  Harvester are falling appart. The baron needs to know the model and hull integrity of the harvester whose hull_integrity is between 60 and 80%.
+Harvester are falling appart. The baron needs to know the model and hull integrity of the harvester whose hull_integrity is between 60 and 80%.
 
 ```
 SELECT harv_hull_integrity, harv_model
@@ -141,8 +140,7 @@ FROM HARVESTER
 WHERE harv_hull_integrity BETWEEN 60 AND 80;
 ```
 
-
-3) The Tuek family are known smugglers... We need to identify if there are such individuals in our crew with "Tuek" in their names. If there is, we want their full name, member id and crew id.
+The Tuek family are known smugglers... We need to identify if there are such individuals in our crew with "Tuek" in their names. If there is, we want their full name, member id and crew id.
 
 ```
 SELECT member_id, member_name, cs_id
@@ -151,14 +149,23 @@ WHERE member_name LIKE '%Tuek';
 ```
 
 
+The Baron needs to understand which sectors of his fief are dangerous... To do so, he'll cross-examine data from his spotter and harvester, to check in which 
+sectors the seismic magnitude is either "High" or "Critical".
+
+```
+SELECT sp_id, ms_id, sp_seismic_magnitude
+FROM monitors m
+JOIN HARVESTER h
+ON h.harv_ID = m.harv_ID
+WHERE sp_seismic_magnitude IN ("High", "Critical")
+ORDER BY sp_seismic_magnitude
+;
+```
+
+This query uses : IN, sorting, SELECTION, Projection, Join
 
 
-
-
-
-## Aggregation functions
-
-1) We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
+We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
 
 ```
 SELECT 
