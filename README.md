@@ -131,6 +131,9 @@ FROM REFINING_BATCH
 WHERE ref_facility_ID LIKE '%Smuggler%' 
    OR ref_facility_ID LIKE '%Industrial%';
 ```
+This query uses : Projection, Selection, Masks
+
+---
 
 Harvester are falling appart. The baron needs to know the model and hull integrity of the harvester whose hull_integrity is between 60 and 80%.
 
@@ -140,6 +143,10 @@ FROM HARVESTER
 WHERE harv_hull_integrity BETWEEN 60 AND 80;
 ```
 
+This query uses : Projection, Selection, BETWEEN
+
+---
+
 The Tuek family are known smugglers... We need to identify if there are such individuals in our crew with "Tuek" in their names. If there is, we want their full name, member id and crew id.
 
 ```
@@ -147,6 +154,7 @@ SELECT member_id, member_name, cs_id
 FROM CREW_MEMBER 
 WHERE member_name LIKE '%Tuek';
 ```
+This query uses : LIKE (Masks), projection, Selection
 
 ---
 The Baron needs to understand which sectors of his fief are dangerous... To do so, he'll cross-examine data from his spotter and harvester, to check in which 
