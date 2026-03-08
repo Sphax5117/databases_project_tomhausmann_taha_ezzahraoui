@@ -124,7 +124,7 @@ In one of the harvester malfunction, some crew members died. Sure, house harkonn
 
 On arrakis, there are smuggler that are using highly industrialized channel to sell spice on the black Market. The Baron needs to get the batch rating and batch value of the facilities containing, in their name, the word "Smuggler" or "Industrial". 
 
-```
+```sql
 SELECT  
     batch_purity_rating, batch_value
 FROM REFINING_BATCH
@@ -137,7 +137,7 @@ This query uses : Projection, Selection, Masks
 
 Harvester are falling appart. The baron needs to know the model and hull integrity of the harvester whose hull_integrity is between 60 and 80%.
 
-```
+```sql
 SELECT harv_hull_integrity, harv_model
 FROM HARVESTER
 WHERE harv_hull_integrity BETWEEN 60 AND 80;
@@ -149,7 +149,7 @@ This query uses : Projection, Selection, BETWEEN
 
 The Tuek family are known smugglers... We need to identify if there are such individuals in our crew with "Tuek" in their names. If there is, we want their full name, member id and crew id.
 
-```
+```sql
 SELECT member_id, member_name, cs_id
 FROM CREW_MEMBER 
 WHERE member_name LIKE '%Tuek';
@@ -160,7 +160,7 @@ This query uses : LIKE (Masks), projection, Selection
 The Baron needs to understand which sectors of his fief are dangerous... To do so, he'll cross-examine data from his spotter and harvester, to check in which 
 sectors the seismic magnitude is either "High" or "Critical".
 
-```
+```sql
 SELECT sp_id, ms_id, sp_seismic_magnitude
 FROM monitors m
 JOIN HARVESTER h
@@ -177,7 +177,7 @@ This query uses : IN, sorting, SELECTION, Projection, Join
 In one of the harvester malfunction (harv_maintenance_request_id = "REQ-URGENT"), some crew members died. Sure, house harkonnen doesn't honnor its people. But here, two very important man to the baron seem to have died. The baron needs to make sure who those two people were. (Note : one of them is the commander of the crew, while the other as the ID of the commander + 1)
 
 
-```
+```sql
 SELECT member_name, cs_disciplinary_action_log
 FROM CREW_MEMBER CM
 JOIN HARVESTER H
@@ -196,7 +196,7 @@ This query uses : Selection, Projection, Multiple Join
 
 We need to check if we meet the imperial quotas. To do so, the baron will need to cross examine the imperial table with the refining_batch table ! Moreoever, we need to understand who is the commander of the crew that harvested this specific batch, to punish him if he didn't meet quotas...
 
-```
+```sql
 SELECT 
     b.batch_id, 
     b.batch_value, 
@@ -214,7 +214,7 @@ This query use : inner join, projection, selection
 
 We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
 
-```
+```sql
 SELECT 
     ref_facility_ID,
     SUM(batch_spice_output) AS total_yield,
@@ -224,4 +224,70 @@ FROM REFINING_BATCH
 GROUP BY ref_facility_ID
 ORDER BY efficiency_percentage ASC
 LIMIT 1;
+```
+ -- Aggregation Functions
+ 
+-- An Imperial Operations Auditor has been sent to Arrakis
+-- to evaluate the efficiency of House Harkonnen's spice
+-- extraction chain.
+
+
+-- The auditor needs to know which harvester contributes the most to the spice flow,
+-- so he orders the harvesters from most to least spice output.
+
+```sql
+SELECT harv_ID,
+       SUM(CAST(batch_spice_output AS DECIMAL(15,2))) AS total_spice_output
+FROM REFINING_BATCH
+GROUP BY harv_ID
+ORDER BY total_spice_output DESC;
+```
+
+-- The auditor suspects theft or inefficient refining in facilities where the gap
+-- between raw aggregate and spice output is too large.
+
+```sql
+SELECT ref_facility_ID,
+       AVG(batch_raw_aggregate - CAST(batch_spice_output AS DECIMAL(15,2))) AS avg_waste
+FROM REFINING_BATCH
+GROUP BY ref_facility_ID
+HAVING AVG(batch_raw_aggregate - CAST(batch_spice_output AS DECIMAL(15,2))) > 500
+ORDER BY avg_waste DESC;
+```
+
+-- Aerial rescue logistics can get quite expensive. In order to cut costs,
+-- he highlights the least efficient carryalls.
+
+```sql
+SELECT ca_ID,
+       AVG(ca_fuel_consumed) AS avg_fuel_consumption
+FROM lift
+GROUP BY ca_ID
+HAVING AVG(ca_fuel_consumed) > 550
+ORDER BY avg_fuel_consumption DESC;
+```
+
+-- The auditor wants his "king harvester", the one that generates the highest wealth,
+-- so he can closely monitor and protect it.
+
+```sql
+SELECT harv_ID,
+       SUM(batch_value) AS total_batch_value
+FROM REFINING_BATCH
+GROUP BY harv_ID
+HAVING SUM(batch_value) > 700000
+ORDER BY total_batch_value DESC;
+```
+
+-- The auditor wants to reveal whether certain harvesters are being pushed
+-- beyond safe limits while still remaining in service.
+
+```sql
+SELECT harv_model,
+       ROUND(AVG(harv_hull_integrity), 2) AS avg_hull_integrity,
+       COUNT(*) AS deployed_units
+FROM HARVESTER
+GROUP BY harv_model
+HAVING AVG(harv_hull_integrity) < 85
+ORDER BY avg_hull_integrity ASC;
 ```
