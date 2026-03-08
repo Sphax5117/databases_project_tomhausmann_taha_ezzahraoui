@@ -315,3 +315,114 @@ GROUP BY harv_model
 HAVING AVG(harv_hull_integrity) < 85
 ORDER BY avg_hull_integrity ASC;
 ```
+-- Nested Queries
+
+While the Imperial Auditor studies efficiency, another figure has arrived on Arrakis:  
+an Imperial Security Inspector dispatched by the Emperor himself
+
+His task is control. Spice is the most valuable substance in the Imperium, and where spice flows,smugglers and corruption follow.
+
+
+The inspector begins with the obvious suspects.  If a crew has already been flagged for smuggling activity, any harvester they operate deserves immediate scrutiny.
+
+```sql
+SELECT harv_ID, harv_model, cs_ID
+FROM HARVESTER
+WHERE cs_ID IN (
+    SELECT cs_ID
+    FROM CREW
+    WHERE cs_smuggling_detected = TRUE
+);
+```
+
+---
+
+Idle crews are rarely innocent on Arrakis.  
+A crew present in the records but assigned to no harvester may be conducting activities outside official oversight.
+
+```sql
+SELECT cs_ID
+FROM CREW
+WHERE cs_ID NOT IN (
+    SELECT cs_ID
+    FROM HARVESTER
+);
+```
+
+---
+If a smuggling crew has harvested spice, that spice must eventually reach a refinery.  
+The inspector therefore checks which facilities have already handled potentially compromised production 
+
+```sql
+SELECT DISTINCT ref_facility_ID
+FROM REFINING_BATCH rb
+WHERE EXISTS (
+    SELECT *
+    FROM HARVESTER h
+    JOIN CREW c ON h.cs_ID = c.cs_ID
+    WHERE h.harv_ID = rb.harv_ID
+      AND c.cs_smuggling_detected = TRUE
+);
+```
+
+---
+On Arrakis, sandworms are everywhere. A harvester that has never triggered a worm alarm may indicate something unusual:  either an extraordinarily safe deployment… or more so records that do not reflect reality.
+
+```sql
+SELECT harv_ID, harv_model
+FROM HARVESTER h
+WHERE NOT EXISTS (
+    SELECT *
+    FROM monitors m
+    WHERE m.harv_ID = h.harv_ID
+      AND m.sp_worm_proximity_alarm = TRUE
+);
+```
+
+---
+The refinery known as Smuggler-Cove-Deep has long been rumored to be connected to underground spice trade routes.vThe inspector compares other refining batches against its output to determine which operations surpass the productivity of this suspicious facility.
+
+```sql
+SELECT harv_ID, batch_id, batch_value, ref_facility_ID
+FROM REFINING_BATCH
+WHERE batch_value > ANY (
+    SELECT batch_value
+    FROM REFINING_BATCH
+    WHERE ref_facility_ID = 'Smuggler-Cove-Deep'
+);
+```
+
+---
+
+Harvester 8 has gained an unfortunate reputation:  
+its output is weak, inconsistent, and perhaps manipulated.
+
+The inspector uses it as a baseline to locate machines whose production clearly exceeds its entire output total.
+
+```sql
+SELECT DISTINCT harv_ID
+FROM REFINING_BATCH
+WHERE batch_value > ALL (
+    SELECT batch_value
+    FROM REFINING_BATCH
+    WHERE harv_ID = 8
+);
+```
+
+---
+Finally, the inspector wants to know which refineries remain completely untouched by smuggling-flagged crews. Such facilities may represent the few locations on Arrakis where the spice flow remains truly clean.
+
+```sql
+SELECT ref_facility_ID
+FROM REFINERY r
+WHERE NOT EXISTS (
+    SELECT *
+    FROM REFINING_BATCH rb
+    JOIN HARVESTER h ON rb.harv_ID = h.harv_ID
+    JOIN CREW c ON h.cs_ID = c.cs_ID
+    WHERE rb.ref_facility_ID = r.ref_facility_ID
+      AND c.cs_smuggling_detected = TRUE
+);
+```
+
+
