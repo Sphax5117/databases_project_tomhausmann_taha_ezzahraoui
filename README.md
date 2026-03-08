@@ -104,7 +104,7 @@ HARVESTER = (harv_ID COUNTER, harv_model VARCHAR(50), harv_hull_integrity BYTE, 
 REFINING_BATCH = (#harv_ID, batch_id VARCHAR(50), batch_date DATETIME, batch_purity_rating VARCHAR(50), batch_raw_aggregate DECIMAL(15,2), batch_spice_output VARCHAR(50), batch_value CURRENCY, #imp_id, #ref_facility_ID);
 lift = (#harv_ID, #ca_ID, ca_evacuation_ROS VARCHAR(50), ca_fuel_consumed DECIMAL(15,2));
 monitors = (#harv_ID, #sp_ID, sp_seismic_magnitude VARCHAR(50), sp_worm_proximity_alarm LOGICAL, sp_time_to_worm_impact VARCHAR(50));
-
+```
 ## Usage Scenario
 
 The database has been developped exclusively for the Baron Vladimir Harkonnen, master of House Harkonnen and Siridar-Governor of Arrakis/Dune.
