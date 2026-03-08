@@ -192,7 +192,23 @@ AND member_id - 1 = member_id_commander OR member_id = 13;
 
 This query uses : Selection, Projection, Multiple Join
 
+---
 
+We need to check if we meet the imperial quotas. To do so, the baron will need to cross examine the imperial table with the refining_batch table ! Moreoever, we need to understand who is the commander of the crew that harvested this specific batch, to punish him if he didn't meet quotas...
+
+```
+SELECT 
+    b.batch_id, 
+    b.batch_value, 
+    i.imp_target_amount,
+    cm.member_name AS commander_name
+FROM REFINING_BATCH b 
+INNER JOIN IMPERIUM i ON b.imp_id = i.imp_id
+INNER JOIN HARVESTER h ON b.harv_ID = h.harv_ID
+INNER JOIN CREW_MEMBER cm ON h.cs_ID = cm.cs_ID
+WHERE cm.member_id_commander IS NULL;
+```
+This query use : inner join, projection, selection
 
 ---
 
