@@ -104,3 +104,70 @@ HARVESTER = (harv_ID COUNTER, harv_model VARCHAR(50), harv_hull_integrity BYTE, 
 REFINING_BATCH = (#harv_ID, batch_id VARCHAR(50), batch_date DATETIME, batch_purity_rating VARCHAR(50), batch_raw_aggregate DECIMAL(15,2), batch_spice_output VARCHAR(50), batch_value CURRENCY, #imp_id, #ref_facility_ID);
 lift = (#harv_ID, #ca_ID, ca_evacuation_ROS VARCHAR(50), ca_fuel_consumed DECIMAL(15,2));
 monitors = (#harv_ID, #sp_ID, sp_seismic_magnitude VARCHAR(50), sp_worm_proximity_alarm LOGICAL, sp_time_to_worm_impact VARCHAR(50));
+
+## Usage Scenario
+
+The database has been developped exclusively for the Baron Vladimir Harkonnen, master of House Harkonnen and Siridar-Governor of Arrakis/Dune.
+
+For the Baron, the planet is a machine. It must produce spice, only produced on this planet.
+
+Lately, his man have been insubordinating...
+Batches of spice have been of low quality...
+Harvesters have been falling appart...
+
+
+In one of the harvester malfunction, some crew members died. Sure, house harkonnen doesn't honnor its people. But here, two very important mans to the baron seems to have died. The baron needs to make sure who those two people were. (Note : one of them is the commander of the crew, while the other as the ID of the commander + 1)
+
+
+Here is the list of data that need to be extracted : 
+
+## Projections and selections : 
+
+1) On arrakis, there are smuggler that are using highly industrialized channel to sell spice on the black Market. The Baron needs to get the batch rating and batch value of the facilities containing, in their name, the word "Smuggler" or "Industrial". 
+
+```
+SELECT  
+    batch_purity_rating, batch_value
+FROM REFINING_BATCH
+WHERE ref_facility_ID LIKE '%Smuggler%' 
+   OR ref_facility_ID LIKE '%Industrial%';
+```
+
+2)  Harvester are falling appart. The baron needs to know the model and hull integrity of the harvester whose hull_integrity is between 60 and 80%.
+
+```
+SELECT harv_hull_integrity, harv_model
+FROM HARVESTER
+WHERE harv_hull_integrity BETWEEN 60 AND 80;
+```
+
+
+3) The Tuek family are known smugglers... We need to identify if there are such individuals in our crew with "Tuek" in their names. If there is, we want their full name, member id and crew id.
+
+```
+SELECT member_id, member_name, cs_id
+FROM CREW_MEMBER 
+WHERE member_name LIKE '%Tuek';
+```
+
+
+
+
+
+
+
+## Aggregation functions
+
+1) We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
+
+```
+SELECT 
+    ref_facility_ID,
+    SUM(batch_spice_output) AS total_yield,
+    SUM(batch_raw_aggregate) AS total_raw_material,
+    (SUM(batch_spice_output) / SUM(batch_raw_aggregate)) * 100 AS efficiency_percentage
+FROM REFINING_BATCH
+GROUP BY ref_facility_ID
+ORDER BY efficiency_percentage ASC
+LIMIT 1;
+```
