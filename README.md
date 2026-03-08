@@ -218,6 +218,29 @@ WHERE cm.member_id_commander IS NULL;
 This query use : inner join, projection, selection
 
 ---
+The Baron wants a list of all known Refineries on Arrakis and see their batch outputs. More importantly, he wants to see all refineries, even those (like 'Guild-Orbital-Transfer') that haven't processed a single batch yet.
+
+```sql
+SELECT 
+    r.ref_facility_ID, 
+    b.batch_id, 
+    b.batch_spice_output
+FROM REFINERY r
+LEFT JOIN REFINING_BATCH b ON r.ref_facility_ID = b.ref_facility_ID;
+```
+---
+The baron is interested in the crew with no casualties : they are his best man. He need to cross the CREW table with their assigned HARVESTER
+
+SELECT 
+    c.cs_ID, 
+    c.cs_headcount_start, 
+    h.harv_model
+FROM CREW c
+LEFT JOIN HARVESTER h ON c.cs_ID = h.cs_ID
+WHERE c.cs_casualties = '0';
+
+
+---
  -- Aggregation Functions
  
 We need to know which refinery is the WORST of all. To do that, the baron must add all the spice output and total raw aggregate grouped by refinery(two seperate fields) and create an efficiency percentage (total spice output/total raw aggregate)x*100* . Then, he must order by descending order to get the worst refinery.
