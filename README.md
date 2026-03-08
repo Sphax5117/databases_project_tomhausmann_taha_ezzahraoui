@@ -121,7 +121,14 @@ In one of the harvester malfunction, some crew members died. Sure, house harkonn
 
 ## Extracted Data
 
+First, the baron would like to have a list of all active harvesters, WITHOUT ANY DUPLICATES ! 
 
+```sql
+SELECT DISTINCT harv_model 
+FROM HARVESTER;
+```
+
+---
 On arrakis, there are smuggler that are using highly industrialized channel to sell spice on the black Market. The Baron needs to get the batch rating and batch value of the facilities containing, in their name, the word "Smuggler" or "Industrial". 
 
 ```sql
