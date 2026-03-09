@@ -115,10 +115,6 @@ Lately, his man have been insubordinating...
 Batches of spice have been of low quality...
 Harvesters have been falling appart...
 
-
-In one of the harvester malfunction, some crew members died. Sure, house harkonnen doesn't honnor its people. But here, two very important mans to the baron seems to have died. The baron needs to make sure who those two people were. (Note : one of them is the commander of the crew, while the other as the ID of the commander + 1)
-
-
 ## Extracted Data
 
 First, the baron would like to have a list of all active harvesters, WITHOUT ANY DUPLICATES ! 
